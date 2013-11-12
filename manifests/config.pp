@@ -12,8 +12,11 @@
 #
 class activemq::config (
   $server_config,
-  $instance,
-  $path = '/etc/activemq/activemq.xml'
+  $stomp_user,
+  $stomp_passwd,
+  $stomp_admin,
+  $stomp_adminpw,
+  $path = '/opt/activemq/conf/activemq.xml'
 ) {
 
   # Resource defaults
@@ -22,7 +25,7 @@ class activemq::config (
     group   => 'activemq',
     mode    => '0644',
     notify  => Service['activemq'],
-    require => Package['activemq'],
+    require => Class['activemq::packages'],
   }
 
   $server_config_real = $server_config

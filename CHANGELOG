@@ -1,18 +1,15 @@
-2013-09-26 Release 0.2.0
+2013-10-17 Felipe Salum <fsalum@gmail.com> - 0.1.9
+* Fixing template variable access deprecation warnings.
 
-Summary:
+2013-06-06 Felipe Salum <fsalum@gmail.com> - 0.1.8
+* Fix for Puppet 3.2.1 deprecation warnings.
+* Added Travis build
 
-Adds Debian osfamily support and proper testing
-
-Backwards-incompatible changes:
-
-The module no longer manages the activemq user/group
-and instead relies on the deb and rpm packages to do it.
-
-Features:
-
-- Add support for Debian osfamilies
-- Add proper spec testing
+2012-11-22 Felipe Salum <fsalum@gmail.com> - 0.1.7
+* Rewrite module to use the Apache ActiveMQ binary instead of Linux distro packages
+* Add parameters to module for activemq.xml config file
+* Fix activemq init script
+* Update README for standard webconsole setting at http://localhost:8161/admin
 
 2011-06-21 Jeff McCune <jeff@puppetlabs.com> - 0.1.6
 * Add webconsole setting to enable console at http://localhost:8160/admin
