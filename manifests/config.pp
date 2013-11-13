@@ -49,8 +49,8 @@ class activemq::config (
   file { 'activemq.xml':
     ensure  => file,
     path    => $path_real,
-    owner   => '0',
-    group   => '0',
+    owner   => 'root',
+    group   => 'root',
     content => $server_config_real,
   }
 

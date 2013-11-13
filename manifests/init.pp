@@ -37,12 +37,11 @@
 #   }
 # }
 #
-class activemq(
-  $version                 = 'present',
+class activemq (
   $ensure                  = 'running',
+  $version                 = '5.9.0',
   $webconsole              = true,
   $server_config           = 'UNSET',
-  $activemq_binary_version = 'apache-activemq-5.9.0',
   $activemq_mem_min        = '1G',
   $activemq_mem_max        = '1G',
   $instance                = 'main',
@@ -69,7 +68,6 @@ class activemq(
   $version_real = $version
   $ensure_real  = $ensure
   $webconsole_real = $webconsole
-  $activemq_binary_version_real = $activemq_binary_version
   $activemq_mem_min_real = $activemq_mem_min
   $activemq_mem_max_real = $activemq_mem_max
   $mq_admin_username_real       = $mq_admin_username
@@ -107,7 +105,6 @@ class activemq(
 
   class { 'activemq::packages':
     version                 => $version_real,
-    activemq_binary_version => $activemq_binary_version_real,
     activemq_mem_min        => $activemq_mem_min_real,
     activemq_mem_max        => $activemq_mem_max_real,
     notify                  => Class['activemq::service'],

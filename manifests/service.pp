@@ -11,7 +11,7 @@
 # Sample Usage:
 #
 class activemq::service(
-  $ensure
+  $ensure,
 ) {
 
   # Arrays cannot take anonymous arrays in Puppet 2.6.8

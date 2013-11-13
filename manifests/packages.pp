@@ -11,48 +11,68 @@
 # Sample Usage:
 #
 class activemq::packages (
-  $version,
-  $home = '/opt/activemq',
-  $activemq_binary_version,
-  $activemq_mem_min,
-  $activemq_mem_max,
+  $apache_mirror = 'http://archive.apache.org/dist/',
+  $version = '5.9.0',
+  $home = '/opt',
+  $user = 'activemq',
+  $group = 'activemq',
+  $activemq_mem_min = '1G',
+  $activemq_mem_max = '1G',
 ) {
+
+  # wget from https://github.com/maestrodev/puppet-wget
+  include wget
 
   validate_re($version, '^[._0-9a-zA-Z:-]+$')
 
-  $version_real                 = $version
-  $home_real                    = $home
-  $activemq_binary_version_real = $activemq_binary_version
+  realize( User[$user], Group[$user] )
 
-  file { "/opt/${activemq_binary_version_real}-bin.tar.gz":
-    ensure => present,
-    source => "puppet:///modules/activemq/${activemq_binary_version_real}-bin.tar.gz",
-    notify => Exec['activemq_pkg'],
-  }
-
-  exec { 'activemq_pkg':
-    path    => '/usr/bin:/usr/sbin:/bin',
-    command => "tar zxvf /opt/${activemq_binary_version_real}-bin.tar.gz -C /opt",
-    user    => root,
-    group   => root,
-    creates => "/opt/${activemq_binary_version_real}",
-    require => File["/opt/${activemq_binary_version_real}-bin.tar.gz"],
-    notify  => File['activemq_init'],
-  }
-
-  file { 'activemq_init':
-    ensure  => file,
-    path    => '/etc/init.d/activemq',
-    owner   => '0',
-    group   => '0',
-    mode    => '0755',
-    content => template('activemq/activemq.init.erb'),
-  }
-
-  file { $home_real:
+  wget::fetch { 'activemq_download':
+    source      => "${apache_mirror}/activemq/apache-activemq/${version}/apache-activemq-${version}-bin.tar.gz",
+    destination => "/usr/local/src/apache-activemq-${version}-bin.tar.gz",
+    require     => [User[$user],Group[$group]],
+  } ->
+  exec { 'activemq_untar':
+    command => "tar xf /usr/local/src/apache-activemq-${version}-bin.tar.gz && chown -R ${user}:${group} ${home}/apache-activemq-${version}",
+    cwd     => $home,
+    creates => "${home}/apache-activemq-${version}",
+    path    => ['/bin',],
+  } ->
+  file { "${home}/activemq":
     ensure  => link,
-    target  => "/opt/${activemq_binary_version_real}",
-    require => Exec['activemq_pkg'],
-    notify  => Service['activemq'],
+    target  => "${home}/apache-activemq-${version}",
+    owner   => $user,
+    group   => $group,
+    require => Exec['activemq_untar'],
+  } ->
+  file { '/etc/activemq':
+    ensure  => link,
+    target  => "${home}/activemq/conf",
+    require => File["${home}/activemq"],
+  } ->
+  file { '/var/log/activemq':
+    ensure  => link,
+    target  => "${home}/activemq/data",
+    require => File["${home}/activemq"],
+  } ->
+  file { "${home}/activemq/bin/linux":
+    ensure  => link,
+    target  => "${home}/activemq/bin/linux-x86-64",
+    require => File["${home}/activemq"],
+  } ->
+  file { '/var/run/activemq':
+    ensure  => directory,
+    owner   => $user,
+    group   => $group,
+    mode    => '0755',
+    require => [User[$user],Group[$group]],
+  } ->
+  file { '/etc/init.d/activemq':
+    ensure  => file,
+    owner   => root,
+    group   => root,
+    mode    => '0755',
+    content => template('activemq/activemq-init.erb'),
   }
+
 }
