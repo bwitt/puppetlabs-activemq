@@ -24,28 +24,6 @@ class activemq::packages (
   $home_real                    = $home
   $activemq_binary_version_real = $activemq_binary_version
 
-  # Manage the user and group in Puppet rather than RPM
-  group { 'activemq':
-    ensure => 'present',
-    gid    => '92',
-    before => User['activemq']
-  }
-
-  user { 'activemq':
-    ensure  => 'present',
-    comment => 'Apache Activemq',
-    gid     => '92',
-    home    => '/opt/activemq',
-    shell   => '/bin/bash',
-    uid     => '92',
-    before  => Exec['activemq_pkg'],
-  }
-
-  #package { 'activemq':
-  #  ensure  => $version_real,
-  #  notify  => Service['activemq'],
-  #}
-
   file { "/opt/${activemq_binary_version_real}-bin.tar.gz":
     ensure => present,
     source => "puppet:///modules/activemq/${activemq_binary_version_real}-bin.tar.gz",

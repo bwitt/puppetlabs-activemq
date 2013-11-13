@@ -45,15 +45,26 @@ class activemq(
   $activemq_binary_version = 'apache-activemq-5.9.0',
   $activemq_mem_min        = '1G',
   $activemq_mem_max        = '1G',
-  $stomp_user              = 'mcollective',
-  $stomp_passwd            = 'marionette',
-  $stomp_admin             = 'admin',
-  $stomp_adminpw           = 'secret',
+  $instance                = 'main',
+  $mq_admin_username       = 'admin',
+  $mq_admin_password       = 'admin',
+  $mq_mcollective_username = 'mcollective',
+  $mq_mcollective_password = 'marionette',
+  $mq_cluster_username     = 'amq',
+  $mq_cluster_password     = 'secret',
+  $mq_cluster_brokers      = [],
 ) {
 
   validate_re($ensure, '^running$|^stopped$')
   validate_re($version, '^present$|^latest$|^[._0-9a-zA-Z:-]+$')
   validate_bool($webconsole)
+  validate_string($mq_admin_username)
+  validate_string($mq_admin_password)
+  validate_string($mq_mcollective_username)
+  validate_string($mq_mcollective_password)
+  validate_string($mq_cluster_username)
+  validate_string($mq_cluster_password)
+  validate_array($mq_cluster_brokers)
 
   $version_real = $version
   $ensure_real  = $ensure
@@ -61,10 +72,25 @@ class activemq(
   $activemq_binary_version_real = $activemq_binary_version
   $activemq_mem_min_real = $activemq_mem_min
   $activemq_mem_max_real = $activemq_mem_max
-  $stomp_user_real = $stomp_user
-  $stomp_passwd_real = $stomp_passwd
-  $stomp_admin_real = $stomp_admin
-  $stomp_adminpw_real = $stomp_adminpw
+  $mq_admin_username_real       = $mq_admin_username
+  $mq_admin_password_real       = $mq_admin_password
+  $mq_mcollective_username_real = $mq_mcollective_username
+  $mq_mcollective_password_real = $mq_mcollective_password
+  $mq_cluster_username_real     = $mq_cluster_username
+  $mq_cluster_password_real     = $mq_cluster_password
+  $mq_cluster_brokers_real      = $mq_cluster_brokers
+
+  if $mq_admin_password_real == 'admin' {
+    warning '$mq_admin_password is set to the default value.  This should be changed.'
+  }
+
+  if $mq_mcollective_password_real == 'marionette' {
+    warning '$mq_mcollective_password is set to the default value.  This should be changed.'
+  }
+
+  if size($mq_cluster_brokers_real) > 0 and $mq_cluster_password_real == 'secret' {
+    warning '$mq_cluster_password is set to the default value.  This should be changed.'
+  }
 
   # Since this is a template, it should come _after_ all variables are set for
   # this class.
@@ -88,13 +114,10 @@ class activemq(
   }
 
   class { 'activemq::config':
-    server_config    => $server_config_real,
-    stomp_user       => $stomp_user_real,
-    stomp_passwd     => $stomp_passwd_real,
-    stomp_admin      => $stomp_admin_real,
-    stomp_adminpw    => $stomp_adminpw_real,
-    require          => Class['activemq::packages'],
-    notify           => Class['activemq::service'],
+    server_config => $server_config_real,
+    instance      => $instance,
+    require       => Class['activemq::packages'],
+    notify        => Class['activemq::service'],
   }
 
   class { 'activemq::service':

@@ -12,10 +12,7 @@
 #
 class activemq::config (
   $server_config,
-  $stomp_user,
-  $stomp_passwd,
-  $stomp_admin,
-  $stomp_adminpw,
+  $instance = 'main',
   $path = '/opt/activemq/conf/activemq.xml'
 ) {
 
