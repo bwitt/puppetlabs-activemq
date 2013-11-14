@@ -45,6 +45,7 @@ class activemq (
   $activemq_mem_min        = '1G',
   $activemq_mem_max        = '1G',
   $instance                = 'main',
+  $home                    = '/opt',
   $mq_admin_username       = 'admin',
   $mq_admin_password       = 'admin',
   $mq_mcollective_username = 'mcollective',
@@ -55,8 +56,9 @@ class activemq (
 ) {
 
   validate_re($ensure, '^running$|^stopped$')
-  validate_re($version, '^present$|^latest$|^[._0-9a-zA-Z:-]+$')
+  validate_re($version, '^[._0-9a-zA-Z:-]+$')
   validate_bool($webconsole)
+  validate_string($home)
   validate_string($mq_admin_username)
   validate_string($mq_admin_password)
   validate_string($mq_mcollective_username)
@@ -70,6 +72,7 @@ class activemq (
   $webconsole_real = $webconsole
   $activemq_mem_min_real = $activemq_mem_min
   $activemq_mem_max_real = $activemq_mem_max
+  $home_real = $home
   $mq_admin_username_real       = $mq_admin_username
   $mq_admin_password_real       = $mq_admin_password
   $mq_mcollective_username_real = $mq_mcollective_username
@@ -104,10 +107,9 @@ class activemq (
   }
 
   class { 'activemq::packages':
-    version                 => $version_real,
-    activemq_mem_min        => $activemq_mem_min_real,
-    activemq_mem_max        => $activemq_mem_max_real,
-    notify                  => Class['activemq::service'],
+    version => $version_real,
+    home    => $home_real,
+    notify  => Class['activemq::service'],
   }
 
   class { 'activemq::config':

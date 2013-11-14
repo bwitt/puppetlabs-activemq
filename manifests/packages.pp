@@ -16,8 +16,6 @@ class activemq::packages (
   $home = '/opt',
   $user = 'activemq',
   $group = 'activemq',
-  $activemq_mem_min = '1G',
-  $activemq_mem_max = '1G',
 ) {
 
   # wget from https://github.com/maestrodev/puppet-wget
@@ -67,11 +65,18 @@ class activemq::packages (
     mode    => '0755',
     require => [User[$user],Group[$group]],
   } ->
+  # fix for RUN_AS_USER
+  file { "${home}/activemq/bin/linux/activemq":
+    ensure  => file,
+    owner   => root,
+    group   => root,
+    mode    => '0755',
+    content => template('activemq/activemq.init.erb'),
+  } ->
   file { '/etc/init.d/activemq':
     ensure  => link,
     target  => "${home}/activemq/bin/linux/activemq",
     owner   => root,
     group   => root,
   }
-
 }

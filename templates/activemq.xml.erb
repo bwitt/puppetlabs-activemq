@@ -14,7 +14,7 @@
     <!-- Allows us to use system properties as variables in this configuration file -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
-	<value>file:${activemq.conf}/credentials.properties</value>
+                <value>file:<%= @home_real %>/activemq/conf/credentials.properties</value>
         </property>
     </bean>
 <% end -%>
@@ -115,7 +115,7 @@
             http://activemq.apache.org/persistence.html
         -->
         <persistenceAdapter>
-            <kahaDB directory="${activemq.base}/data/kahadb"/>
+                <kahaDB directory="<%= @home_real %>/activemq/data/kahadb"/>
         </persistenceAdapter>
 
         <plugins>
