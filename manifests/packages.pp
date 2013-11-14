@@ -68,11 +68,10 @@ class activemq::packages (
     require => [User[$user],Group[$group]],
   } ->
   file { '/etc/init.d/activemq':
-    ensure  => file,
+    ensure  => link,
+    target  => "${home}/activemq/bin/linux/activemq",
     owner   => root,
     group   => root,
-    mode    => '0755',
-    content => template('activemq/activemq-init.erb'),
   }
 
 }
